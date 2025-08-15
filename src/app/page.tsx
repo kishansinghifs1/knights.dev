@@ -1,8 +1,9 @@
 
-export default function Home() {
+
+export default  function Home() {
   return (
     <div>
-      Welcome to the Home Page
+      Welcome to Kinght.dev!
     </div>
   );
 }
