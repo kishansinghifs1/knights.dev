@@ -1,0 +1,17 @@
+# This is a config for E2B sandbox template.
+# You can use template ID (dw5izuobe1qlhlpddj6x) or template name (knights-nextjs-test3) to create a sandbox:
+
+# Python SDK
+# from e2b import Sandbox, AsyncSandbox
+# sandbox = Sandbox("knights-nextjs-test3") # Sync sandbox
+# sandbox = await AsyncSandbox.create("knights-nextjs-test3") # Async sandbox
+
+# JS SDK
+# import { Sandbox } from 'e2b'
+# const sandbox = await Sandbox.create('knights-nextjs-test3')
+
+team_id = "ce2bb1f1-3368-4a82-a74a-88c8c44f0fb7"
+start_cmd = "/compile_page.sh"
+dockerfile = "e2b.Dockerfile"
+template_name = "knights-nextjs-test3"
+template_id = "dw5izuobe1qlhlpddj6x"
