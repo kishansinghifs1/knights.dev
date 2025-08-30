@@ -9,30 +9,34 @@ import { toast } from "sonner";
 const Page = () => {
   const [value, setValue] = useState("");
   const trpc = useTRPC();
-  const { data: messages } = useQuery(trpc.messages.getMany.queryOptions());
-  const createMessage = useMutation(
-    trpc.messages.create.mutationOptions({
+  const createProject = useMutation(
+    trpc.projects.create.mutationOptions({
       onSuccess: () => {
         toast.success("Message sent successfully!");
+        setValue("");
+      },
+      onError: (error) => {
+        toast.error(error.message || "Failed to send message");
       },
     })
   );
   return (
-    <div className="p-4 max-w-7xl mx-auto">
-      <Input
-        placeholder="Type your message here..."
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-      />
-      <Button
-        disabled={createMessage.isPending}
-        onClick={() => {
-          createMessage.mutate({ value: value });
-        }}
-      >
-        Send Message
-      </Button>
-      {JSON.stringify(messages, null, 2)}
+    <div className="h-screen w-screen flex items-center justify-center">
+      <div className="max-w-7xl mx-auto flex items-center flex-col gap-y-4 justify-center">
+        <Input
+          placeholder="Type your message here..."
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+        <Button
+          disabled={createProject.isPending}
+          onClick={() => {
+            createProject.mutate({ value: value });
+          }}
+        >
+          Send Message
+        </Button>
+      </div>
     </div>
   );
 };
