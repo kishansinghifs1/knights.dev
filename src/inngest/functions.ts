@@ -67,28 +67,39 @@ export const knightFunction = inngest.createFunction(
 
     // 6. Save results to DB
     const hasError =
-      !result.state.data.summary ||
-      !Object.keys(result.state.data.files || {}).length;
+      !result.state.data.summary &&
+      (!result.state.data.files ||
+        Object.keys(result.state.data.files).length === 0);
 
     await step.run("save-result", async () => {
       if (hasError) {
         return await prisma.message.create({
           data: {
-            projectId: event.data.projectId,
-            content: "Something went wrong",
             role: "ASSISTANT",
             type: "ERROR",
+            content: "An error occurred while processing your request.",
+            projectId: event.data.projectId,
+          },
+        });
+      } else {
+        return await prisma.message.create({
+          data: {
+            projectId: event.data.projectId,
+            content: result.state.data.summary,
+            role: "ASSISTANT",
+            type: "RESULT",
             fragments: {
               create: {
                 sandboxUrl: sandboxUrl,
                 title: "fragment",
-                files: result.state.data.files || {},
+                files: JSON.parse(
+                  JSON.stringify(result.state.data?.files ?? {})
+                ),
               },
             },
           },
         });
       }
-
     });
 
     return {

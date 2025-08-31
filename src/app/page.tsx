@@ -5,14 +5,18 @@ import { Input } from "@/components/ui/input";
 import { useTRPC } from "@/trpc/client";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useRouter } from "next/dist/client/components/navigation";
 
 const Page = () => {
+  const router = useRouter();
+  
   const [value, setValue] = useState("");
   const trpc = useTRPC();
   const createProject = useMutation(
     trpc.projects.create.mutationOptions({
-      onSuccess: () => {
+      onSuccess: (data) => {
         toast.success("Message sent successfully!");
+        router.push(`/projects/${data.id}`);
         setValue("");
       },
       onError: (error) => {
