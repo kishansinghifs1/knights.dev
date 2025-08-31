@@ -9,9 +9,10 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { MessageContainer } from "../components/message-container";
-import { Suspense, useState } from "react";
+import { act, Suspense, useState } from "react";
 import { Fragment } from "@/generated/prisma";
 import { ProjectHeader } from "../components/project-header";
+import { FragmentPreview } from "../components/fragment-web";
 
 interface Props {
   projectId: string;
@@ -41,7 +42,7 @@ export const ProjectView = ({ projectId }: Props) => {
           minSize={50}
           className="flex flex-col min-h-0"
         >
-          TODO:PREVIEW
+         {!!activeFragment && <FragmentPreview data={activeFragment} />}
         </ResizablePanel>
       </ResizablePanelGroup>
     </div>
