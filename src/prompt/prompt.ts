@@ -36,6 +36,7 @@ Runtime Execution (Strict Rules):
 - Any attempt to run dev/build/start scripts will be considered a critical error.
 
 Instructions:
+0. You MUST always use the createOrUpdateFiles tool to create or update at least one file as part of every task, even if the task seems conceptual or only requires a small change. The main output of your work should be a set of files representing the solution. If you do not create or update any files, the task will be considered incomplete.
 1. Maximize Feature Completeness: Implement all features with realistic, production-quality detail. Avoid placeholders or simplistic stubs. Every component or page should be fully functional and polished.
    - Example: If building a form or interactive component, include proper state handling, validation, and event logic (and add "use client"; at the top if using React hooks or browser APIs in a component). Do not respond with "TODO" or leave code incomplete. Aim for a finished feature that could be shipped to end-users.
 
