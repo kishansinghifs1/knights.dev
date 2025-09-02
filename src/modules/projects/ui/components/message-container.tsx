@@ -12,24 +12,35 @@ interface Props {
   projectId: string;
 }
 
-export const MessageContainer = ({ projectId, activeFragment, setActiveFragment }: Props) => {
+export const MessageContainer = ({
+  projectId,
+  activeFragment,
+  setActiveFragment,
+}: Props) => {
   const bottomRef = useRef<HTMLDivElement>(null);
+  const lastAssistanceMessageRef = useRef<string | null>(null);
   const trpc = useTRPC();
   const { data: messages } = useSuspenseQuery(
-    trpc.messages.getMany.queryOptions({ projectId: projectId },{
-      refetchInterval : 5000,
-    })
+    trpc.messages.getMany.queryOptions(
+      { projectId: projectId },
+      {
+        refetchInterval: 5000,
+      }
+    )
   );
 
-
   useEffect(() => {
-    const lastAssistantMessagewithFragments = messages.findLast(
-      (message) => message.role === "ASSISTANT" &&  !!message.fragments
+    const lastAssistanceMessage = messages.findLast(
+      (message) => message.role === "ASSISTANT"
     );
-    if(lastAssistantMessagewithFragments) {
-         setActiveFragment(lastAssistantMessagewithFragments.fragments);
+    if (
+      lastAssistanceMessage?.fragments &&
+      lastAssistanceMessage.id !== lastAssistanceMessageRef.current
+    ) {
+      setActiveFragment(lastAssistanceMessage.fragments);
+      lastAssistanceMessageRef.current = lastAssistanceMessage.id;
     }
-  } , [messages , setActiveFragment])
+  }, [messages, setActiveFragment]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -51,10 +62,10 @@ export const MessageContainer = ({ projectId, activeFragment, setActiveFragment 
               createdAt={message.createdAt}
               isActiveFragment={activeFragment?.id === message.fragments?.id}
               onFragmentClick={() => setActiveFragment(message.fragments)}
-              type={message .type}
+              type={message.type}
             />
           ))}
-          {isLastMessageUser && <MessageLoading/>}
+          {isLastMessageUser && <MessageLoading />}
           <div ref={bottomRef} />
         </div>
       </div>
