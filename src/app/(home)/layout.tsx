@@ -1,3 +1,7 @@
+"use client"
+
+import { Navbar } from "@/modules/home/ui/components/navbar";
+
 interface Props {
   children: React.ReactNode;
 }
@@ -12,6 +16,7 @@ const Layout = ({ children }: Props) => {
         [background-size:16px_16px]"
       />
       <div className="flex-1 flex flex-col px-4 pb-4">
+        <Navbar/>
         {children}
       </div>
     </main>
