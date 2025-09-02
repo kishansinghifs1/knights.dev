@@ -8,6 +8,7 @@ import {
   Message,
   createState,
 } from "@inngest/agent-kit";
+import { AnyZodType } from "@inngest/agent-kit";
 import { Sandbox } from "@e2b/code-interpreter";
 import { getSandbox, lastAssistantMessage } from "./utils";
 import { z } from "zod";
@@ -87,7 +88,7 @@ export const knightFunction = inngest.createFunction(
           description: "A tool for interacting with the terminal",
           parameters: z.object({
             command: z.string(),
-          }),
+          }) as unknown as AnyZodType,
           handler: async ({ command }, { step }) => {
             return await step?.run("Terminal", async () => {
               const buffer = { stdout: "", stderr: "" };
@@ -121,7 +122,7 @@ export const knightFunction = inngest.createFunction(
                 content: z.string(),
               })
             ),
-          }),
+          }) as unknown as AnyZodType,
           handler: async (
             { files },
             { step, network }: Tool.Options<AgentState>
@@ -157,7 +158,7 @@ export const knightFunction = inngest.createFunction(
                 path: z.string(),
               })
             ),
-          }),
+          }) as unknown as AnyZodType,
           handler: async ({ files }, { step }) => {
             return await step?.run("readFiles", async () => {
               try {
