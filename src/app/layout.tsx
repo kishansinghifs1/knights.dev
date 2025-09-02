@@ -5,6 +5,7 @@ import { TRPCReactProvider } from "@/trpc/client";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "next-themes";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Variable } from "lucide-react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +28,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <ClerkProvider >
+    <ClerkProvider 
+      appearance={{
+        variables:{
+          colorPrimary: "#6E5F4A",  
+        }
+      }}
+    >
       <TRPCReactProvider>
         <html lang="en" suppressHydrationWarning>
           <body
