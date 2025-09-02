@@ -24,7 +24,7 @@ export const MessageContainer = ({
     trpc.messages.getMany.queryOptions(
       { projectId: projectId },
       {
-        refetchInterval: 5000,
+        refetchInterval: 2000,
       }
     )
   );
