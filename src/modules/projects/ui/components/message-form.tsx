@@ -7,7 +7,7 @@ import { useTRPC } from "@/trpc/client";
 import { Button } from "@/components/ui/button";
 import { Form, FormField } from "@/components/ui/form";
 import { toast } from "sonner";
-import { use, useState } from "react";
+import {  useState } from "react";
 import { ArrowUp01Icon, Loader2Icon } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Usage } from "./usage";
@@ -50,7 +50,7 @@ export const MessageForm = ({ projectId }: Props) => {
 
   const createMessage = useMutation(
     trpc.messages.create.mutationOptions({
-      onSuccess: (data) => {
+      onSuccess: () => {
         form.reset();
         queryClient.invalidateQueries(
           trpc.messages.getMany.queryOptions({ projectId })

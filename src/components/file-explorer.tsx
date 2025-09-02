@@ -18,7 +18,6 @@ import { Hint } from "./hint";
 import { Button } from "./ui/button";
 import { convertFilesToTreeItems } from "@/lib/utils";
 import { TreeView } from "./tree-view";
-import { fa } from "zod/v4/locales";
 
 type FileCollection = { [path: string]: string };
 
