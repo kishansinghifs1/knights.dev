@@ -5,12 +5,18 @@ import {
   createTool,
   gemini,
   Tool,
+  Message,
+  createState,
 } from "@inngest/agent-kit";
 import { Sandbox } from "@e2b/code-interpreter";
 import { getSandbox, lastAssistantMessage } from "./utils";
 import { z } from "zod";
 import prisma from "@/lib/db";
-import { dev_prompt } from "@/prompt/prompt";
+import {
+  dev_prompt,
+  FRAGMENT_TITLE_PROMPT,
+  RESPONSE_PROMPT,
+} from "@/prompt/prompt";
 
 interface AgentState {
   summary: string;
@@ -25,6 +31,39 @@ export const knightFunction = inngest.createFunction(
       const sandbox = await Sandbox.create("knights-nextjs-test3");
       return sandbox.sandboxId;
     });
+
+    const previousMessages = await step.run(
+      "get-previous-messages",
+      async () => {
+        const formattedMessages: Message[] = [];
+        const messages = await prisma.message.findMany({
+          where: {
+            projectId: event.data.projectId,
+          },
+          orderBy: {
+            createdAt: "desc",
+          },
+        });
+        for (const message of messages) {
+          formattedMessages.push({
+            type: "text",
+            role: message.role === "ASSISTANT" ? "assistant" : "user",
+            content: message.content,
+          });
+        }
+        return formattedMessages;
+      }
+    );
+
+    const state = createState<AgentState>(
+      {
+        summary: "",
+        files: {},
+      },
+      {
+        messages: previousMessages,
+      }
+    );
 
     // Create a production-grade AI coding agent
     const knight = createAgent<AgentState>({
@@ -154,6 +193,7 @@ export const knightFunction = inngest.createFunction(
       name: "code-agency",
       agents: [knight],
       maxIter: 15,
+      defaultState: state,
       router: async ({ network }) => {
         const summary = network.state.data.summary;
         if (summary) {
@@ -163,7 +203,44 @@ export const knightFunction = inngest.createFunction(
       },
     });
 
-    const result = await network.run(event.data.value);
+    const result = await network.run(event.data.value, { state });
+
+    const fragmentTitleGenerator = createAgent<AgentState>({
+      name: "fragment generator",
+      system: FRAGMENT_TITLE_PROMPT,
+      model: gemini({
+        model: "gemini-2.5-flash",
+        apiKey: process.env.GEMINI_API_KEY,
+        defaultParameters: {
+          generationConfig: {
+            temperature: 0.2, // Lowered for accuracy
+            maxOutputTokens: 4000, // Prevent truncation
+          },
+        },
+      }),
+    });
+
+    const responseTitleGenerator = createAgent<AgentState>({
+      name: "respons generator",
+      system: RESPONSE_PROMPT,
+      model: gemini({
+        model: "gemini-2.5-flash",
+        apiKey: process.env.GEMINI_API_KEY,
+        defaultParameters: {
+          generationConfig: {
+            temperature: 0.2, // Lowered for accuracy
+            maxOutputTokens: 4000, // Prevent truncation
+          },
+        },
+      }),
+    });
+
+    const { output: fragmentTitleOutput } = await fragmentTitleGenerator.run(
+      result.state.data.summary
+    );
+    const { output: responseOutput } = await responseTitleGenerator.run(
+      result.state.data.summary
+    );
 
     // 7. Save results to DB
     const isError =
@@ -177,7 +254,32 @@ export const knightFunction = inngest.createFunction(
       return `http://${host}`;
     });
 
-    const projectId = event.data.projectId; // ensure this is passed when triggering the function
+    const generateResponse = () => {
+      if (responseOutput[0].type !== "text") {
+        return "Here you go";
+      }
+
+      if (Array.isArray(responseOutput[0].content)) {
+        return responseOutput[0].content.map((txt) => txt).join("");
+      } else {
+        return responseOutput[0].content;
+      }
+    };
+
+
+    const generateFragmentTitle = () => {
+      if(fragmentTitleOutput[0].type !== "text"){
+        return "Fragment"
+      }
+
+      if(Array.isArray(fragmentTitleOutput[0].content)){
+        return fragmentTitleOutput[0].content.map((txt) => txt).join("")
+      }else{
+        return fragmentTitleOutput[0].content
+      }
+    }
+
+    const projectId = event.data.projectId;
 
     await step.run("save-result", async () => {
       if (isError) {
@@ -194,13 +296,13 @@ export const knightFunction = inngest.createFunction(
       }
       return prisma.message.create({
         data: {
-          content: result.state.data.summary,
+          content: generateResponse(),
           role: "ASSISTANT",
           type: "RESULT",
           fragments: {
             create: {
               sandboxUrl,
-              title: "Fragment",
+              title: generateFragmentTitle(),
               files: result.state.data.files,
             },
           },

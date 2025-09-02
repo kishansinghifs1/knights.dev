@@ -56,17 +56,16 @@ export const ProjectForm = () => {
     trpc.projects.create.mutationOptions({
       onSuccess: (data) => {
         queryClient.invalidateQueries(trpc.projects.getMany.queryOptions());
-        queryClient.invalidateQueries(trpc.usage.status.queryOptions())
+        queryClient.invalidateQueries(trpc.usage.status.queryOptions());
         router.push(`/projects/${data.id}`);
-         
       },
       onError: (error) => {
         toast.error(`Failed to send message: ${error.message}`);
         if (error.data?.code === "UNAUTHORIZED") {
           clerk.openSignIn();
         }
-        if(error.data?.code === "TOO_MANY_REQUESTS"){
-           router.push(`/pricing`);
+        if (error.data?.code === "TOO_MANY_REQUESTS") {
+          router.push(`/pricing`);
         }
       },
     })
@@ -98,6 +97,8 @@ export const ProjectForm = () => {
                 maxRows={8}
                 className="pt-4 resize-none border-none w-full outline-none bg-transparent"
                 placeholder="What would you like to build?"
+                spellCheck={false}
+                suppressHydrationWarning
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.ctrlKey && !e.metaKey) {
                     e.preventDefault();

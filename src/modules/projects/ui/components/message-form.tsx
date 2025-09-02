@@ -9,7 +9,7 @@ import { Form, FormField } from "@/components/ui/form";
 import { toast } from "sonner";
 import { use, useState } from "react";
 import { ArrowUp01Icon, Loader2Icon } from "lucide-react";
-import {  useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Usage } from "./usage";
 import { useRouter } from "next/navigation";
 
@@ -28,13 +28,12 @@ const formSchema = z.object({
 
 export const MessageForm = ({ projectId }: Props) => {
   const [isFocused, setIsFocused] = useState(false);
-  
 
   const trpc = useTRPC();
-  const router = useRouter()
+  const router = useRouter();
   const queryClient = useQueryClient();
 
-  const {data : usage} = useQuery(trpc.usage.status.queryOptions())
+  const { data: usage } = useQuery(trpc.usage.status.queryOptions());
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -49,28 +48,35 @@ export const MessageForm = ({ projectId }: Props) => {
     await createMessage.mutateAsync({ value: values.value, projectId });
   };
 
-  const createMessage = useMutation(trpc.messages.create.mutationOptions(
-    {
-        onSuccess: (data) => {
-            form.reset();
-            queryClient.invalidateQueries(trpc.messages.getMany.queryOptions({ projectId }));
-            queryClient.invalidateQueries(trpc.usage.status.queryOptions())
-        },
-        onError: (error) => {
-            toast.error(`Failed to send message: ${error.message}`);
-            if(error.data?.code === 'TOO_MANY_REQUESTS'){
-                    router.push("/pricing")
-            }
-        },
-    }
-  ));
+  const createMessage = useMutation(
+    trpc.messages.create.mutationOptions({
+      onSuccess: (data) => {
+        form.reset();
+        queryClient.invalidateQueries(
+          trpc.messages.getMany.queryOptions({ projectId })
+        );
+        queryClient.invalidateQueries(trpc.usage.status.queryOptions());
+      },
+      onError: (error) => {
+        toast.error(`Failed to send message: ${error.message}`);
+        if (error.data?.code === "TOO_MANY_REQUESTS") {
+          router.push("/pricing");
+        }
+      },
+    })
+  );
 
   const isPending = createMessage.isPending;
   const isButtonDisabled = isPending || !form.formState.isValid;
 
   return (
     <Form {...form}>
-      {showUsage && (<Usage points={usage.remainingPoints} msBeforeNext={usage.msBeforeNext}/>)}
+      {showUsage && (
+        <Usage
+          points={usage.remainingPoints}
+          msBeforeNext={usage.msBeforeNext}
+        />
+      )}
       <form
         onSubmit={form.handleSubmit(onSubmit)}
         className={cn(
@@ -92,6 +98,8 @@ export const MessageForm = ({ projectId }: Props) => {
               maxRows={8}
               className="pt-4 resize-none border-none w-full outline-none bg-transparent"
               placeholder="What would you like to build?"
+              spellCheck={false} // Force SSR and CSR to match
+              suppressHydrationWarning
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.ctrlKey && !e.metaKey) {
                   e.preventDefault();
@@ -109,8 +117,18 @@ export const MessageForm = ({ projectId }: Props) => {
             </kbd>
             &nbsp;<span className="text-sm sm:text-base">to submit</span>
           </div>
-          <Button disabled={isButtonDisabled} className={cn("size-8 rounded-full", isButtonDisabled && "bg-muted-foreground border")}>
-            {isPending ? ( <Loader2Icon className="h-4 w-4 animate-spin" /> ) : <ArrowUp01Icon className="h-12 w-12 sm:h-14 sm:w-14" />}
+          <Button
+            disabled={isButtonDisabled}
+            className={cn(
+              "size-8 rounded-full",
+              isButtonDisabled && "bg-muted-foreground border"
+            )}
+          >
+            {isPending ? (
+              <Loader2Icon className="h-4 w-4 animate-spin" />
+            ) : (
+              <ArrowUp01Icon className="h-12 w-12 sm:h-14 sm:w-14" />
+            )}
           </Button>
         </div>
       </form>
