@@ -195,7 +195,7 @@ export const knightFunction = inngest.createFunction(
     const network = createNetwork<AgentState>({
       name: "code-agency",
       agents: [knight],
-      maxIter: 15,
+      maxIter: 4,
       defaultState: state,
       router: async ({ network }) => {
         const summary = network.state.data.summary;
@@ -254,7 +254,7 @@ export const knightFunction = inngest.createFunction(
     const sandboxUrl = await step.run("get-sandbox-url", async () => {
       const sandbox = await getSandbox(sandboxId);
       const host = sandbox.getHost(3000);
-      return `http://${host}`;
+      return `https://${host}`;
     });
 
     const generateResponse = () => {

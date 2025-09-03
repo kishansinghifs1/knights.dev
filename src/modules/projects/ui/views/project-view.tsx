@@ -1,5 +1,8 @@
 "use client";
 
+import { useTRPC } from "@/trpc/client";
+import { useSuspenseQuery } from "@tanstack/react-query";
+
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Link from "next/link";
 import {
@@ -8,23 +11,20 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { MessageContainer } from "../components/message-container";
-import { Suspense, useState } from "react";
+import {  Suspense, useState } from "react";
 import { Fragment } from "@/generated/prisma";
 import { ProjectHeader } from "../components/project-header";
 import { FragmentPreview } from "../components/fragment-web";
 import { EyeIcon, CodeIcon, CrownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FileExplorer } from "@/components/file-explorer";
-import { UserControl } from "@/components/user-control";
-import { useAuth } from "@clerk/nextjs";
+import { CodeView } from "@/components/code-view";
 
 interface Props {
   projectId: string;
 }
 
 export const ProjectView = ({ projectId }: Props) => {
-  const { has } = useAuth();
-  const hasProAccess = has?.({ plan: "pro" });
   const [activeFragment, setActiveFragment] = useState<Fragment | null>(null);
   const [tabState, setTabState] = useState<"preview" | "code">("preview");
 
@@ -65,35 +65,22 @@ export const ProjectView = ({ projectId }: Props) => {
                 </TabsTrigger>
               </TabsList>
               <div className="ml-auto flex items-center gap-x-2">
-                {!hasProAccess && (
-                  <Button asChild size="sm" variant="tertiary">
-                    <Link href="/pricing">
-                      <CrownIcon /> <span>Upgrade</span>
-                    </Link>
-                  </Button>
-                )}
-
-                <UserControl />
+                <Button asChild size="sm" variant="default">
+                  <Link href="/pricing">
+                    <CrownIcon /> <span>Upgrade</span>
+                  </Link>
+                </Button>
               </div>
             </div>
-            <TabsContent value="preview">
-              {!!activeFragment && <FragmentPreview data={activeFragment} />}
+            <TabsContent value="preview" >
+              {!!activeFragment &&  <FragmentPreview data={activeFragment} />}
             </TabsContent>
-            <TabsContent value="code" className="min-h-0">
-              {!!activeFragment?.files &&
+            <TabsContent value="code" className="min-h-0" >
+              {!!activeFragment?.files && (
                 (() => {
-                  console.log(
-                    "activeFragment.files:",
-                    activeFragment.files,
-                    typeof activeFragment.files,
-                    Array.isArray(activeFragment.files)
-                  );
-                  return (
-                    <FileExplorer
-                      files={activeFragment.files as { [path: string]: string }}
-                    />
-                  );
-                })()}
+                  return <FileExplorer files={activeFragment.files as { [path: string]: string }} />;
+                })()
+              ) }
             </TabsContent>
           </Tabs>
         </ResizablePanel>
