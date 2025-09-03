@@ -27,7 +27,7 @@ export const PROJECT_TEMPLATES = [
     emoji: "📺",
     title: "Build a YouTube clone",
     prompt:
-      "Build a YouTube-style homepage with mock video thumbnails, a category sidebar, and a modal preview with title and description using local state. Ensure clean alignment and a well-organized grid layout.",
+      "Build a YouTube-style homepage , a category sidebar, Ensure clean alignment and a well-organized grid layout.",
   },
   {
     emoji: "🛍️",
@@ -45,6 +45,6 @@ export const PROJECT_TEMPLATES = [
     emoji: "🎵",
     title: "Build a Spotify clone",
     prompt:
-      "Build a Spotify-style music player with a sidebar for playlists, a main area for song details, and playback controls. Use local state for managing playback and song selection. Prioritize layout balance and intuitive control placement for a smooth user experience. Use dark mode.",
+      "Build a Spotify-style music player with a sidebar for playlists, a main area for song details, and playback controls. Prioritize layout balance and intuitive control placement for a smooth user experience. Use dark mode.",
   }
 ] as const;

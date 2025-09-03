@@ -2,7 +2,7 @@ import { Card } from "@/components/ui/card";
 import { Fragment, MessageRole, MessageType } from "@/generated/prisma";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { ChevronRightIcon, Code2Icon } from "lucide-react";
+import { ChevronRightIcon, Code2Icon, AlertCircleIcon } from "lucide-react";
 import Image from "next/image";
 
 interface UserMessageProps {
@@ -70,28 +70,39 @@ const AssistantMessage = ({
   onFragmentClick,
   type,
 }: AssistantMessageProps) => {
+  const isError = type === "ERROR";
+  
   return (
-    <div
-      className={cn(
-        "flex flex-col group px-2 pb-4",
-        type === "ERROR" && "text-red-700 dark:text-red-500"
-      )}
-    >
+    <div className="flex flex-col group px-2 pb-4">
       <div className="flex items-center gap-2 pl-2 mb-2">
-        <Image
-          src="/logo.svg"
-          alt="Knight Avatar"
-          width={18}
-          height={18}
-          className="shrink-0"
-        />
-        <span className="text-sm font-medium">Knight</span>
+        {isError ? (
+          <AlertCircleIcon className="size-[18px] text-red-500 shrink-0" />
+        ) : (
+          <Image
+            src="/logo.svg"
+            alt="Knight Avatar"
+            width={18}
+            height={18}
+            className="shrink-0"
+          />
+        )}
+        <span className={cn(
+          "text-sm font-medium",
+          isError && "text-red-700 dark:text-red-400"
+        )}>
+          {isError ? "Error" : "Knight"}
+        </span>
         <span className="text-sm text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100">
           {format(createdAt, "HH:mm 'on' MMM dd, yyyy")}
         </span>
       </div>
       <div className="pl-8.5 flex flex-col gap-y-4">
-        <span>{content}</span>
+        <div className={cn(
+          "rounded-lg p-3",
+          isError && "bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400"
+        )}>
+          {content}
+        </div>
         {fragments && type === "RESULT" && (
           <div className="flex flex-col gap-y-2">
             <FragmentCard
