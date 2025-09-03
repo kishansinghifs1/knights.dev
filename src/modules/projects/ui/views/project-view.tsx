@@ -8,13 +8,15 @@ import {
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
 import { MessageContainer } from "../components/message-container";
-import {  Suspense, useState } from "react";
+import { Suspense, useState } from "react";
 import { Fragment } from "@/generated/prisma";
 import { ProjectHeader } from "../components/project-header";
 import { FragmentPreview } from "../components/fragment-web";
 import { EyeIcon, CodeIcon, CrownIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { FileExplorer } from "@/components/file-explorer";
+import { useAuth } from "@clerk/nextjs";
+import { UserControl } from "@/components/user-control";
 
 interface Props {
   projectId: string;
@@ -23,6 +25,8 @@ interface Props {
 export const ProjectView = ({ projectId }: Props) => {
   const [activeFragment, setActiveFragment] = useState<Fragment | null>(null);
   const [tabState, setTabState] = useState<"preview" | "code">("preview");
+  const { has } = useAuth();
+  const hasProAccess = has?.({ plan: "pro" });
 
   return (
     <div className="h-screen">
@@ -61,22 +65,29 @@ export const ProjectView = ({ projectId }: Props) => {
                 </TabsTrigger>
               </TabsList>
               <div className="ml-auto flex items-center gap-x-2">
-                <Button asChild size="sm" variant="default">
-                  <Link href="/pricing">
-                    <CrownIcon /> <span>Upgrade</span>
-                  </Link>
-                </Button>
+                {!hasProAccess && (
+                  <Button asChild size="sm" variant="tertiary">
+                    <Link href="/pricing">
+                      <CrownIcon /> <span>Upgrade</span>
+                    </Link>
+                  </Button>
+                )}
+
+                <UserControl/>
               </div>
             </div>
-            <TabsContent value="preview" >
-              {!!activeFragment &&  <FragmentPreview data={activeFragment} />}
+            <TabsContent value="preview">
+              {!!activeFragment && <FragmentPreview data={activeFragment} />}
             </TabsContent>
-            <TabsContent value="code" className="min-h-0" >
-              {!!activeFragment?.files && (
+            <TabsContent value="code" className="min-h-0">
+              {!!activeFragment?.files &&
                 (() => {
-                  return <FileExplorer files={activeFragment.files as { [path: string]: string }} />;
-                })()
-              ) }
+                  return (
+                    <FileExplorer
+                      files={activeFragment.files as { [path: string]: string }}
+                    />
+                  );
+                })()}
             </TabsContent>
           </Tabs>
         </ResizablePanel>
