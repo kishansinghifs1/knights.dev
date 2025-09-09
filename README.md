@@ -28,8 +28,6 @@ Add the following image files into `public/docs/` to render these screenshots in
 
 ![Animated Landing Page](public/docs/landing-animated.png)
 
-If images do not display on platforms that strip relative paths, consider using absolute raw URLs (e.g., GitHub raw links) once the images are pushed to the repository.
-
 
 ## Tech Overview
 
