@@ -2,6 +2,35 @@
 
 This document describes the architecture and design of Knight.dev, including authentication, sandboxing, background jobs, API layer, UI system, and database schema. It also outlines key request flows and configuration.
 
+
+
+## Screenshots
+
+Add the following image files into `public/docs/` to render these screenshots in the README. Filenames are suggestions; you can replace them with your own but keep the markdown paths consistent or update them here.
+
+- Authentication (Clerk sign-in)
+
+![Clerk Sign In](public/docs/clerk-sign-in.png)
+
+- Signed-in Home with User Menu
+
+![Home Signed In](public/docs/home-signed-in.png)
+
+- Builder: Video Homepage Example (Sidebar + Grid)
+
+![Chat Builder](public/docs/chat.png)
+
+-Builder: Generated Code
+
+![Code Preview](public/docs/generated-code.png)
+
+- Landing Page with Animations (Preview)
+
+![Animated Landing Page](public/docs/landing-animated.png)
+
+If images do not display on platforms that strip relative paths, consider using absolute raw URLs (e.g., GitHub raw links) once the images are pushed to the repository.
+
+
 ## Tech Overview
 
 - **Framework**: Next.js 15 (App Router)
@@ -312,29 +341,3 @@ GEMINI_API_KEY="AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 # Set by scripts or environment; included here for completeness
 # NODE_ENV="development"
 ```
-
-## Screenshots
-
-Add the following image files into `public/docs/` to render these screenshots in the README. Filenames are suggestions; you can replace them with your own but keep the markdown paths consistent or update them here.
-
-- Authentication (Clerk sign-in)
-
-![Clerk Sign In](public/docs/clerk-sign-in.png)
-
-- Signed-in Home with User Menu
-
-![Home Signed In](public/docs/home-signed-in.png)
-
-- Builder: Video Homepage Example (Sidebar + Grid)
-
-![Chat Builder](public/docs/chat.png)
-
--Builder: Generated Code
-
-![Code Preview](public/docs/generated-code.png)
-
-- Landing Page with Animations (Preview)
-
-![Animated Landing Page](public/docs/landing-animated.png)
-
-If images do not display on platforms that strip relative paths, consider using absolute raw URLs (e.g., GitHub raw links) once the images are pushed to the repository.
